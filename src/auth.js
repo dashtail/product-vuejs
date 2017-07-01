@@ -1,9 +1,7 @@
-import {router} from './routes'
-
 // URL and endpoint constants
 const API_URL = 'http://localhost:3000/'
 const LOGIN_URL = API_URL + 'auth/'
-const SIGNUP_URL = API_URL + 'users/'
+const SIGNUP_URL = API_URL + 'singup/'
 
 export default {
 
@@ -14,34 +12,37 @@ export default {
 
   // Send a request to the login URL and save the returned JWT
   login(context, creds, redirect) {
-    context.$http.post(LOGIN_URL, creds, (data) => {
-      localStorage.setItem('id_token', data.id_token)
-      localStorage.setItem('access_token', data.access_token)
+    context.$http.post(LOGIN_URL, creds).then((data) => {
+      console.log(data);
+      localStorage.setItem('id_token', data.body.token)
+      localStorage.setItem('x-access-token', data.body.token)
 
       this.user.authenticated = true
 
       // Redirect to a specified route
       if(redirect) {
-        router.go(redirect)
+        context.$router.push(redirect)
       }
 
-    }).error((err) => {
+    },(err) => {
       context.error = err
     })
   },
 
   signup(context, creds, redirect) {
-    context.$http.post(SIGNUP_URL, creds, (data) => {
-      localStorage.setItem('id_token', data.id_token)
-      localStorage.setItem('access_token', data.access_token)
+    context.$http.post(SIGNUP_URL, creds).then((data) => {
+      console.log(data);
+      localStorage.setItem('id_token', data.body.token)
+      localStorage.setItem('x-access-token', data.body.token)
 
       this.user.authenticated = true
 
+      // Redirect to a specified route
       if(redirect) {
-        router.go(redirect)
+        context.$router.push(redirect)
       }
 
-    }).error((err) => {
+    },(err) => {
       context.error = err
     })
   },
@@ -49,14 +50,16 @@ export default {
   // To log out, we just need to remove the token
   logout() {
     localStorage.removeItem('id_token')
-    localStorage.removeItem('access_token')
+    localStorage.removeItem('x-access-token')
     this.user.authenticated = false
   },
 
   checkAuth() {
     var jwt = localStorage.getItem('id_token')
+    console.log(jwt);
     if(jwt) {
       this.user.authenticated = true
+      return jwt;
     }
     else {
       this.user.authenticated = false
@@ -66,7 +69,7 @@ export default {
   // The object to be passed as a header for authenticated requests
   getAuthHeader() {
     return {
-      'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+      'x-access-token':localStorage.getItem('access_token')
     }
   }
 }

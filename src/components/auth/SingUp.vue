@@ -3,10 +3,10 @@
 <div class="col-md-6 col-md-offset-3">
     <div class="panel panel-primary">
         <div class="panel-heading">
-            <h3 class="panel-title">Login</h3>
+            <h3 class="panel-title">Crie seu usuário</h3>
         </div>
         <div class="panel-body">
-            <form @submit.prevent="login()">
+            <form @submit.prevent="saveUser()">
                 <div class="col-md-10">
                     <div class="form-group">
                           <label for="username">Usuário</label>
@@ -20,7 +20,7 @@
                           <small class="text-danger" role="alert" v-show="errors.has('password')">{{ errors.first('password') }}</small>
                     </div>
                     <div class="form-group">
-                          <input type="submit" value="Entrar" class="btn btn-primary">
+                          <input type="submit" value="Cadastrar" class="btn btn-primary">
                     </div>
                 </div>
             </form>
@@ -32,8 +32,16 @@
 
 <script>
 import User from '../../domain/user/User'
+import auth from '../../auth'
+
 export default {
     created() {
+        this.service = new UserService(this.$resource);
+        if (this.id){
+            this.service
+                .detail(this.id)
+                .then(user => this.user = user);
+        }
     },
     data() {
         return {
@@ -42,17 +50,8 @@ export default {
     },
 
     methods:{
-        login(){
-            this.$auth.login({
-                body: {username: this.user.username, password:this.user.password},
-                success: function () {
-                console.log('Usuário logado com sucesso.')
-                },
-                error: function () {
-                console.log('Usuário e/ou senha inválidos.')
-                },
-                redirect: '/signup'
-            });
+        saveUser(){
+            auth.signup(this, this.user, '/');
         }
     }
 }

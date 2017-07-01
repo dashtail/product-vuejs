@@ -10,10 +10,11 @@ import 'bootstrap/dist/css/bootstrap.css';
 import msg from './locale/vee_validate/pt_BR';
 
 import { routes } from './routes';
+import auth from './auth';
 
-Vue.use(VueResource);
 Vue.use(VueRouter);
 Vue.use(VueSweetAlert);
+Vue.use(VueResource);
 
 Validator.addLocale(msg);
 Vue.use(VeeValidate, {
@@ -26,19 +27,8 @@ const router = new VueRouter({
     mode: 'history'
  });
 
-Vue.router = router;
-
-Vue.use(require('@websanova/vue-auth'), {
-  auth: require('@websanova/vue-auth/drivers/auth/bearer.js'),
-  http: require('@websanova/vue-auth/drivers/http/vue-resource.1.x.js'),
-  router: require('@websanova/vue-auth/drivers/router/vue-router.2.x.js'),
-  rolesVar: 'type',
-  loginData: {url: 'auth', method: 'POST', redirect: '/', fetchUser: false},
-  fetchData: {url: 'auth/user', method: 'GET'},
-  refreshData: {url: 'auth/refresh', method: 'GET', atInit: false}
-});
-
 Vue.http.options.root = "http://localhost:3000";
+Vue.http.headers.common['x-access-token'] = auth.checkAuth();
 
 new Vue({
   el: '#app',

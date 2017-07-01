@@ -49,6 +49,7 @@
 <script>
 import ProductService from '../../domain/product/ProductService'
 import Pagination from '../shared/Pagination.vue'
+import auth from '../../auth'
 
 export default {
     data () {
@@ -59,7 +60,7 @@ export default {
     },
     created(){
         this.service = new ProductService(this.$resource);
-
+        console.log(auth.checkAuth());
         this.service
          .list()
          .then(products => this.products = products, err => console.log(err));
